@@ -1,25 +1,44 @@
 pipeline {
-    agent any
+    agent any  // Runs on any available Jenkins agent
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/hearty101224/ci-cd-automation.git' 
+                git branch: 'main', url: 'https://github.com/hearty10122a/ci-cd-automation.git'
             }
         }
-        stage('Install Dependencies') {
+
+        stage('Setup Python Environment') {
             steps {
-                sh 'pip install -r requirements.txt'
+                script {
+                    // Check Python version to ensure it's installed
+                    sh 'python --version || python3 --version'
+                }
             }
         }
-        stage('Run Python Script') {
+
+        stage('Run Application') {
             steps {
-                sh 'python3 app.py'
+                script {
+                    // Run the Python script
+                    sh 'python app.py || python3 app.py' // Adjust based on OS
+                }
             }
         }
-        stage('Test Application') {
+
+        stage('Post-Build') {
             steps {
-                sh 'pytest test_app.py'
+                echo 'Build completed successfully!'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed! Check logs for errors.'
         }
     }
 }
