@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/hearty101224/https://github.com/hearty101224/ci-cd-automation.git'
+                git 'https://github.com/hearty101224/ci-cd-automation.git' 
             }
         }
         stage('Install Dependencies') {
