@@ -1,4 +1,4 @@
 import app
 
 def test_hello():
-    assert app.hello() == "Hello, CI/CD!"
+    assert app.hello() == "Hello, Jenkins!"
