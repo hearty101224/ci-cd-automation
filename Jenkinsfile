@@ -1,27 +1,51 @@
 pipeline {
     agent any  // Runs on any available Jenkins agent
 
+    environment {
+        GITHUB_CREDENTIALS_ID = 'github-credentials' // Ensure this is set in Jenkins credentials
+        REPO_URL = 'https://github.com/hearty101224/ci-cd-automation.git'
+        BRANCH_NAME = 'main'
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/hearty10122a/ci-cd-automation.git'
+                script {
+                    checkout scmGit(
+                        branches: [[name: "${BRANCH_NAME}"]],
+                        userRemoteConfigs: [[
+                            url: "${REPO_URL}",
+                            credentialsId: "${GITHUB_CREDENTIALS_ID}"
+                        ]]
+                    )
+                }
             }
         }
 
         stage('Setup Python Environment') {
             steps {
                 script {
-                    // Check Python version to ensure it's installed
+                    // Ensure Python is installed and install dependencies
                     sh 'python --version || python3 --version'
+                    sh 'pip install -r requirements.txt || pip3 install -r requirements.txt'
                 }
             }
         }
 
-        stage('Run Application') {
+        stage('Run Unit Tests') {
             steps {
                 script {
-                    // Run the Python script
-                    sh 'python app.py || python3 app.py' // Adjust based on OS
+                    // Run Python unit tests
+                    sh 'pytest tests/ --junitxml=report.xml'
+                }
+            }
+        }
+
+        stage('Build and Deploy') {
+            steps {
+                script {
+                    echo "Building and Deploying Application..."
+                    sh 'python app.py || python3 app.py'  // Adjust based on OS
                 }
             }
         }
